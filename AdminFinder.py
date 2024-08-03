@@ -131,3 +131,6 @@ for path in wordlist:
 
     except req.exceptions.RequestException as e:
         print(f"{r}[!] Error reaching {test_url}: {e}{w}")
+
+
+# made by: @Amirprx3
