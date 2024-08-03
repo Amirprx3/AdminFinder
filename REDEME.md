@@ -50,7 +50,7 @@ The output will display the status of each attempted path with color-coded statu
 
 ---
 # Example Output
-
+![alt image](https://github.com/user-attachments/assets/0dd26dd4-af00-4037-8f83-8a8c5d43ecfe)
 
 # Author
 Amirprx3
