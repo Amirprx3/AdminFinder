@@ -36,6 +36,7 @@ AdminFinder can be used with both default and custom wordlists.
 
 ---
 # Options
+-h, --help: Help to use the tool\
 -u, --url: Target URL (required)\
 -d, --default: Use default wordlist\
 -w, --wordlist: Path to custom wordlist
