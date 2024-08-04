@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+# !/usr/bin/env python3
 
 import os
 import sys
@@ -34,7 +34,7 @@ def neonEffect(text):
 neonEffect(
     f'''
 {g}     ___      __        _        ____ _          __         
-    / _ | ___/ /__ _   (_)___   / __/(_)___  ___/ /___  ____
+{g}    / _ | ___/ /__ _   (_)___   / __/(_)___  ___/ /___  ____
 {w}   / __ |/ _  //  ' \ / // _ \ / _/ / // _ \/ _  // -_)/ __/
 {r}  /_/ |_|\_,_//_/_/_//_//_//_//_/  /_//_//_/\_,_/ \__//_/   
 
@@ -42,7 +42,7 @@ neonEffect(
   {g}Version | 1.0
   {w}MadeBy: @Amirprx3
   {r}GitHub: https://github.com/Amirprx3
-{p} ----------------------------------------------------------- {w}
+{p} -----------------------------------------------------------
 
 '''
 )
@@ -132,5 +132,4 @@ for path in wordlist:
     except req.exceptions.RequestException as e:
         print(f"{r}[!] Error reaching {test_url}: {e}{w}")
 
-
-# made by: @Amirprx3
+#made by: @Amirprx3
