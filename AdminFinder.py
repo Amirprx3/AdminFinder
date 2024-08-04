@@ -1,9 +1,8 @@
-# !/usr/bin/env python3
-
 import os
 import sys
 import time
 import argparse
+import requests
 
 try:
     import urllib3; urllib3.disable_warnings()
@@ -43,7 +42,7 @@ neonEffect(
   {w}MadeBy: @Amirprx3
   {r}GitHub: https://github.com/Amirprx3
 {p} -----------------------------------------------------------
-
+{w}
 '''
 )
 
@@ -77,7 +76,8 @@ if not url.startswith('http://') and not url.startswith('https://'):
 
 # Make a GET request to the URL
 try:
-    test = req.get(url, verify=False)
+    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
+    test = req.get(url, headers=headers, verify=False)
     test.raise_for_status()
     print(f"{w}[*] Successfully reached the URL: {url}")
 except req.exceptions.RequestException as e:
@@ -87,6 +87,7 @@ except req.exceptions.RequestException as e:
 # Delay for 5 seconds
 time.sleep(5)
 
+# Ensure the URL is in the correct format without 'http://' or 'https://'
 url = url.replace('http://', '').replace('https://', '')
 
 # Default wordlist file path
@@ -113,23 +114,23 @@ else:
     print(f"{r}[!] Please use -d or --default to use the default wordlist or provide a custom wordlist with -w or --wordlist{w}")
     sys.exit(1)
 
-print(f"{g}<------------------------START------------------------>{w}\n")
+print(f"{g}<-----------------------------START----------------------------->{w}\n")
 
 for path in wordlist:
     test_url = f"http://{url}/{path}"
 
     try:
-        response = req.get(test_url, verify=False)
+        response = req.get(test_url, headers=headers, verify=False)
         status_code = response.status_code
 
-        if status_code < 400 or status_code == 200:
+        if status_code < 400:
             print(f'[{g}{status_code}{w}] Found a page - URL: {test_url}')
         elif 400 <= status_code < 500:
             print(f'[{r}{status_code}{w}] Could not find page - URL: {test_url}')
         elif status_code >= 500:
-            print(f'{y}[{status_code}{w}] Server error - URL: {test_url}')
+            print(f'[{y}{status_code}{w}] Server error - URL: {test_url}')
 
     except req.exceptions.RequestException as e:
         print(f"{r}[!] Error reaching {test_url}: {e}{w}")
 
-#made by: @Amirprx3
+# madeBy: @Amirprx3
