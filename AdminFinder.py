@@ -2,7 +2,6 @@ import os
 import sys
 import time
 import argparse
-import requests
 
 try:
     import urllib3; urllib3.disable_warnings()
@@ -132,5 +131,8 @@ for path in wordlist:
 
     except req.exceptions.RequestException as e:
         print(f"{r}[!] Error reaching {test_url}: {e}{w}")
-
+    
+    except KeyboardInterrupt:
+        print("\n[!] Exiting :(")
+        sys.exit()
 # madeBy: @Amirprx3
