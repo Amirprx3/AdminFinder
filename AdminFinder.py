@@ -6,7 +6,7 @@ import random
 from fake_useragent import UserAgent
 from concurrent.futures import ThreadPoolExecutor
 import httpx
-from bs4 import BeautifulSoup  # To extract the page title
+from bs4 import BeautifulSoup
 
 try:
     import urllib3; urllib3.disable_warnings()
@@ -52,6 +52,9 @@ neonEffect(
 def validate_url(url):
     if len(url) < 5:
         raise ValueError("URL is too short!")
+    # ساده‌ترین چک برای فرمت URL
+    if '.' not in url:
+        raise ValueError("Invalid URL format! Please include a domain (e.g., example.com)")
 
 def load_proxies(proxy_file):
     try:
@@ -62,9 +65,10 @@ def load_proxies(proxy_file):
         return []
 
 def test_proxy(proxy):
+    transport = httpx.HTTPTransport(proxy=proxy) if proxy else None
     client = None
     try:
-        client = httpx.Client(verify=False, follow_redirects=True, proxies={"http://": proxy, "https://": proxy})
+        client = httpx.Client(verify=False, follow_redirects=True, transport=transport)
         response = client.get("https://www.google.com", headers=get_random_headers(), timeout=5)
         if response.status_code == 200:
             print(f"{g}[*] Proxy {proxy} is working{w}")
@@ -96,19 +100,15 @@ def is_404_page(content, base_content, base_title, base_length, response_url, or
     content_length = len(content)
     page_title = get_page_title(content)
 
-    # Checking 404 words
-    if any(keyword in content_lower for keyword in ["404", "not found", "page not found", "error 404"]):
+    if any(keyword in content_lower for keyword in ["404", "not found", "page not found", "error 404"]): # Amirprx3
         return True
     
-    # If redirected to the home page
     if response_url != original_url and response_url == base_url:
         return True
     
-    # If the page title is the same as the home page
     if page_title and page_title == base_title and "location" not in headers:
         return True
     
-    # If the content length is similar to the home page and is not a redirect
     if abs(content_length - base_length) < 100 and "location" not in headers:
         return True
     
@@ -147,9 +147,11 @@ def determine_protocol(base_url, retries=1):
                         protocol = redirect_url.split('://')[0] + "://"
                         print(f"{w}[*] Redirected to {protocol} for {base_url}{w}")
                         return protocol
-            except Exception as e:
+            except httpx.RequestError as e:
                 print(f"{y}[!] HTTPS attempt {attempt + 1} failed for {base_url}: {e}{w}")
-            
+            except Exception as e:
+                print(f"{y}[!] Unexpected error in HTTPS attempt {attempt + 1}: {e}{w}")
+
             try:
                 test_url = f"http://{base_url}"
                 response = client.get(test_url, headers=get_random_headers(), timeout=15)
@@ -162,13 +164,16 @@ def determine_protocol(base_url, retries=1):
                         protocol = redirect_url.split('://')[0] + "://"
                         print(f"{w}[*] Redirected to {protocol} for {base_url}{w}")
                         return protocol
-            except Exception as e:
+            except httpx.RequestError as e:
                 print(f"{y}[!] HTTP attempt {attempt + 1} failed for {base_url}: {e}{w}")
-            
+            except Exception as e:
+                print(f"{y}[!] Unexpected error in HTTP attempt {attempt + 1}: {e}{w}")
+
             if attempt < retries:
+                print(f"{y}[*] Retrying in 2 seconds...{w}")
                 time.sleep(2)
-        
-        print(f"{r}[!] Could not determine protocol for {base_url} after {retries + 1} attempts{w}")
+
+        print(f"{r}[!] Could not determine protocol for {base_url}. It might be an invalid domain or unreachable.{w}")
         sys.exit(1)
     finally:
         client.close()
@@ -177,13 +182,14 @@ def scan_path(args):
     path, full_url, proxies_list, base_content, base_title, base_length, base_url = args
     test_url = f"{full_url}/{path}"
     proxy = random.choice(proxies_list) if proxies_list else None
-    client = httpx.Client(verify=False, follow_redirects=True, proxies={"http://": proxy, "https://": proxy} if proxy else None)
+    transport = httpx.HTTPTransport(proxy=proxy) if proxy else None
+    client = httpx.Client(verify=False, follow_redirects=True, transport=transport)
     try:
         response = client.get(test_url, headers=get_random_headers(), timeout=10)
         status_code = response.status_code
         content = response.text
         headers = response.headers
-        final_url = str(response.url) # Final URL after redirect
+        final_url = str(response.url)
 
         if status_code == 403 or status_code == 429:
             return f"{y}[!] Blocked by WAF or rate limit - URL: {test_url} (Proxy: {proxy or 'None'}){w}"
@@ -210,7 +216,7 @@ def scan_path(args):
 parser = argparse.ArgumentParser(description='AdminFinder Ultimate - Advanced Admin Panel Finder')
 parser.add_argument('-u', '--url', required=True, help='Target URL (with or without http:// or https://)')
 parser.add_argument('-d', '--default', action='store_true', help='Use default wordlist')
-parser.add_argument('-w', '--wordlist', help='Path to custom wordlist')
+parser.add_argument('-w', '--wordlist', help='Path to custom wordlist') # Amirprx3
 parser.add_argument('-p', '--proxy', help='Single proxy (http://user:pass@host:port or socks5://...)')
 parser.add_argument('-pf', '--proxyfile', help='Path to proxy list file')
 parser.add_argument('-t', '--threads', type=int, default=10, help='Number of threads (default: 10)')
@@ -302,4 +308,4 @@ except KeyboardInterrupt:
     sys.exit(0)
 
 print(f"{g}<-----------------------------FINISHED----------------------------->{w}")
-# made by: Amirprx3
+# Amirprx3
